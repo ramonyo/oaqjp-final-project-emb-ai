@@ -1,0 +1,32 @@
+from flask import Flask, request, jsonify
+import requests
+
+app = Flask(__name__)
+
+API_URL = "https://sn-watson-emotion.labs.skills.network/v1/watson.runtime.nlp.v1/NlpService/EmotionPredict"
+HEADERS = {
+    "grpc-metadata-mm-model-id": "emotion_aggregated-workflow_lang_en_stock"
+}
+
+@app.route("/emotionDetector", methods=["GET"])
+def emotion_detector(text_to_analyse):
+    #text_to_analyse = request.args.get("textToAnalyze", "")
+
+    if not text_to_analyse:
+        return jsonify({"error": "Missing textToAnalyze parameter"}), 400
+
+    payload = {
+        "raw_document": {
+            "text": text_to_analyse
+        }
+    }
+
+    response = requests.post(API_URL, json=payload, headers=HEADERS)
+
+    return response.text#, response.status_code, {
+        #"Content-Type": response.headers.get("Content-Type", "application/json")
+    #}
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
